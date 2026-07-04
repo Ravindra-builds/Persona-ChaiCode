@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fe;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+
+  /* Glass surface tokens — light mode: soft, airy, faintly blue-tinted glass */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-shadow: 0 8px 32px rgba(30, 64, 175, 0.08), 0 1.5px 0 rgba(255, 255, 255, 0.6) inset;
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+}
+
+.dark {
+  --bg-primary: #05070f;
+  --bg-secondary: #0b1020;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+
+  /* Glass surface tokens — dark mode: deep indigo-tinted glass */
+  --glass-bg: rgba(30, 41, 59, 0.45);
+  --glass-bg-strong: rgba(30, 41, 59, 0.6);
+  --glass-border: rgba(148, 163, 255, 0.15);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 1.5px 0 rgba(148, 163, 255, 0.08) inset;
+  --glass-highlight: rgba(148, 163, 255, 0.1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+::selection {
+  background: #fbbf24;
+  color: #000;
+}
+
+.dark ::selection {
+  background: #3b82f6;
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Ambient background mesh — soft blurred color blobs behind glass pages   */
+/* ---------------------------------------------------------------------- */
+
+.mesh-bg {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 55%, var(--bg-secondary) 100%);
+}
+
+.mesh-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(38rem 26rem at 12% -8%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(34rem 30rem at 92% 8%, rgba(56, 189, 248, 0.14), transparent 60%),
+    radial-gradient(40rem 32rem at 50% 105%, rgba(129, 140, 248, 0.12), transparent 60%);
+}
+
+.dark .mesh-bg::before {
+  background-image:
+    radial-gradient(38rem 26rem at 12% -8%, rgba(79, 70, 229, 0.28), transparent 60%),
+    radial-gradient(34rem 30rem at 92% 8%, rgba(14, 165, 233, 0.22), transparent 60%),
+    radial-gradient(40rem 32rem at 50% 105%, rgba(99, 102, 241, 0.2), transparent 60%);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Glassmorphism surface — used for cards, panels, and the auth form       */
+/* ---------------------------------------------------------------------- */
+
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+.glass-panel-strong {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.dark .glass-input {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(148, 163, 255, 0.15);
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.dark .glass-input:focus {
+  background: rgba(15, 23, 42, 0.6);
+}
