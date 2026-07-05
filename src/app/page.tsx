@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -8,7 +9,7 @@ const mentors = [
   {
     href: "/hitesh",
     code: "01",
-    name: "Hitesh",
+    name: "Hitesh Sir",
     studio: "Chai aur Code",
     line: "JS, React, DSA, career.",
     avatar: "/asset/hitesh-sir.jpg",
@@ -18,7 +19,7 @@ const mentors = [
   {
     href: "/piyush",
     code: "02",
-    name: "Piyush",
+    name: "Piyush Sir",
     studio: "Systems Architect",
     line: "Backend, infra, AWS, scale.",
     avatar: "/asset/piyush-sir.jpg",
@@ -29,30 +30,62 @@ const mentors = [
 
 export default function Home() {
   const { user, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const initials = useMemo(() => {
+    if (!user?.name) return "U";
+    return user.name
+      .split(" ")
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  }, [user?.name]);
 
   return (
     <div className="mesh-bg min-h-screen text-slate-950 dark:text-stone-50">
       <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/80 p-1 shadow-lg shadow-slate-900/10 ring-1 ring-slate-950/10 dark:bg-slate-900/80 dark:ring-white/10">
-            <img src="/asset/logo.png" alt="MentorOS logo" className="h-7 w-7 object-contain" />
-          </span>
-          <span className="text-sm font-semibold tracking-[0.22em] text-slate-800 dark:text-stone-200">MENTOROS</span>
+          <img src="/asset/logo.png" alt="MentorOS logo" className="h-10 w-auto object-contain" />
+          <span className="text-sm font-semibold tracking-[0.24em] text-slate-800 dark:text-stone-200">MENTOROS</span>
         </Link>
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
           {user ? (
-            <>
-              <span className="hidden max-w-32 truncate text-sm text-slate-600 dark:text-stone-400 sm:inline">{user.name}</span>
+            <div className="relative">
               <button
-                onClick={logout}
-                className="rounded-md border border-slate-950/10 bg-white/55 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-200 dark:hover:bg-white/10"
+                onClick={() => setMenuOpen((value) => !value)}
+                className="flex items-center gap-2 rounded-full border border-slate-950/10 bg-white/70 px-2 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-200 dark:hover:bg-white/10"
                 type="button"
               >
-                Logout
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-xs font-bold text-white dark:bg-stone-100 dark:text-slate-950">
+                  {initials}
+                </span>
+                <span className="hidden max-w-28 truncate sm:inline">{user.name}</span>
               </button>
-            </>
+
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-950/10 bg-white/95 p-2 shadow-xl shadow-slate-900/10 backdrop-blur dark:border-white/10 dark:bg-slate-900/95">
+                  <button className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:bg-slate-950/5 dark:text-stone-300 dark:hover:bg-white/10" type="button">
+                    Profile
+                  </button>
+                  <button className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:bg-slate-950/5 dark:text-stone-300 dark:hover:bg-white/10" type="button">
+                    Settings
+                  </button>
+                  <button
+                    className="mt-1 flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-600 transition hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-500/10"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      logout();
+                    }}
+                    type="button"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <Link
               href="/login"

@@ -146,32 +146,13 @@ export function LoginForm() {
         <ThemeToggle />
       </div>
 
-      <div className="grid w-full max-w-5xl overflow-hidden rounded-lg border border-slate-950/10 bg-white/35 shadow-2xl shadow-slate-900/10 backdrop-blur-xl dark:border-white/10 dark:bg-white/5 lg:grid-cols-[0.95fr_1.05fr]">
-        <section className="hidden min-h-[620px] flex-col justify-between bg-slate-950 p-8 text-white dark:bg-stone-50 dark:text-slate-950 lg:flex">
-          <div>
-            <Link href="/" className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-white text-xs font-black text-slate-950 dark:bg-slate-950 dark:text-white">
-              DM
-            </Link>
-            <div className="mt-16 h-px w-24 bg-white/35 dark:bg-slate-950/25" />
-            <h1 className="mt-8 text-5xl font-semibold leading-none tracking-tight">
-              Mentor
-              <br />
-              access.
-            </h1>
-          </div>
-          <div className="grid grid-cols-3 gap-2 text-center text-xs font-bold uppercase tracking-[0.18em] text-white/55 dark:text-slate-950/55">
-            <span>Secure</span>
-            <span>Fast</span>
-            <span>Focused</span>
-          </div>
-        </section>
-
-        <section className="glass-panel-strong p-6 sm:p-8 lg:p-10">
+        <section className="glass-panel-strong rounded-[24px] p-6 sm:p-8 w-100">
           <div className="mb-8 flex items-center justify-between">
-            <Link href="/" className="rounded-md border border-slate-950/10 bg-white/45 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10">
-              Home
+            <Link href="/" className="flex items-center gap-3 rounded-full border border-slate-950/10 bg-white/70 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10">
+              <img src="/asset/logo.png" alt="MentorOS logo" className="h-8 w-auto object-contain" />
+              <span>MentorOS</span>
             </Link>
-            <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400 dark:text-stone-500">MentorOS</div>
+            <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400 dark:text-stone-500">Access</div>
           </div>
 
           <div className="mb-8">
@@ -259,8 +240,15 @@ export function LoginForm() {
                 <div className="h-px flex-1 bg-slate-950/10 dark:bg-white/10" />
               </div>
 
-              <a href="/api/auth/google" className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-950/10 bg-white/55 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-200 dark:hover:bg-white/10">
-                <span className="font-black">G</span>
+              <a href="/api/auth/google" className="flex w-full items-center justify-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-50/80 py-3.5 text-sm font-semibold text-emerald-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-100 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/20">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-emerald-200 dark:bg-slate-950/70 dark:ring-emerald-500/30">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                    <path fill="#4285F4" d="M21.6 12.23c0-.79-.07-1.54-.2-2.27H12v4.3h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.9-1.75 2.98-4.33 2.98-7.55Z" />
+                    <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.44l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.07v2.58A10 10 0 0 0 12 22Z" />
+                    <path fill="#FBBC05" d="M6.41 13.9a6.01 6.01 0 0 1 0-3.8V7.52H3.07a10 10 0 0 0 0 12.76l3.34-2.38Z" />
+                    <path fill="#EA4335" d="M12 6.04c1.47 0 2.79.5 3.83 1.49l2.87-2.87A9.94 9.94 0 0 0 12 2a10 10 0 0 0-8.93 5.52l3.34 2.58C7.2 7.8 9.4 6.04 12 6.04Z" />
+                  </svg>
+                </span>
                 Continue with Google
               </a>
             </>
@@ -289,6 +277,5 @@ export function LoginForm() {
           </div>
         </section>
       </div>
-    </div>
   );
 }
