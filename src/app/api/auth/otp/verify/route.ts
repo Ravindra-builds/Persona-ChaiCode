@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { findUserByEmail, updateUserVerification } from "@/lib/auth";
-import { verifyOtp } from "@/lib/otp";
+import { verifyOtpCode } from "@/services/otpService";
 
 const otpSchema = z.object({
   email: z.string().trim().email().toLowerCase(),
@@ -18,8 +18,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No account found for this email." }, { status: 404 });
     }
 
-    const valid = await verifyOtp(user.id, code);
-    if (!valid) {
+    try {
+      await verifyOtpCode({ email, otp: code });
+    } catch {
       return NextResponse.json({ error: "Invalid or expired OTP." }, { status: 400 });
     }
 

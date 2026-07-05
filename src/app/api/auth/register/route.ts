@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createUser, findUserByEmail, hashPassword } from "@/lib/auth";
-import { createOtp } from "@/lib/otp";
+import { createAndSendOtp } from "@/services/otpService";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2).max(255),
@@ -21,10 +21,9 @@ export async function POST(req: Request) {
 
     const passwordHash = await hashPassword(password);
     const user = await createUser({ name, email, passwordHash, verified: false });
-    const code = await createOtp(user.id);
 
-    console.info(`OTP for ${email}: ${code}`);
-    return NextResponse.json({ ok: true });
+    await createAndSendOtp({ email, name });
+    return NextResponse.json({ ok: true, message: "Account created. Check your inbox for the OTP." });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.flatten().fieldErrors }, { status: 400 });
