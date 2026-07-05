@@ -7,33 +7,23 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const mentors = [
   {
     href: "/hitesh",
+    code: "01",
+    name: "Hitesh",
+    studio: "Chai aur Code",
+    line: "JS, React, DSA, career.",
     mark: "C",
-    name: "Chai aur Code",
-    mentor: "Hitesh Choudhary",
-    description: "Fundamentals, career clarity, React, JavaScript, and practical learning discipline.",
-    tags: ["JavaScript", "React", "Git", "DSA", "Career"],
-    tone: "Warm Hinglish mentor",
-    classes: {
-      mark: "bg-amber-100 text-amber-800 ring-amber-200 dark:bg-amber-400/10 dark:text-amber-200 dark:ring-amber-400/20",
-      border: "hover:border-amber-300 dark:hover:border-amber-500/40",
-      cta: "text-amber-700 dark:text-amber-300",
-      tag: "bg-amber-500/10 text-amber-800 ring-amber-500/15 dark:text-amber-200",
-    },
+    accent: "from-[#d6b36a] to-[#8b5e20]",
+    ring: "group-hover:border-[#d6b36a]/55",
   },
   {
     href: "/piyush",
+    code: "02",
+    name: "Piyush",
+    studio: "Systems Architect",
+    line: "Backend, infra, AWS, scale.",
     mark: "S",
-    name: "Systems Architect",
-    mentor: "Piyush Garg",
-    description: "Backend, infra, scale, Docker, AWS, and production-grade architecture decisions.",
-    tags: ["Backend", "DevOps", "AWS", "Docker", "System Design"],
-    tone: "Direct systems thinker",
-    classes: {
-      mark: "bg-sky-100 text-sky-800 ring-sky-200 dark:bg-sky-400/10 dark:text-sky-200 dark:ring-sky-400/20",
-      border: "hover:border-sky-300 dark:hover:border-sky-500/40",
-      cta: "text-sky-700 dark:text-sky-300",
-      tag: "bg-sky-500/10 text-sky-800 ring-sky-500/15 dark:text-sky-200",
-    },
+    accent: "from-[#111827] to-[#64748b] dark:from-[#f7f4ed] dark:to-[#8f8a80]",
+    ring: "group-hover:border-slate-900/35 dark:group-hover:border-white/35",
   },
 ];
 
@@ -41,35 +31,32 @@ export default function Home() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="mesh-bg min-h-screen">
-      <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5">
+    <div className="mesh-bg min-h-screen text-slate-950 dark:text-stone-50">
+      <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-950 text-sm font-black text-white shadow-lg shadow-slate-900/15 dark:bg-white dark:text-slate-950">
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-950 text-xs font-black text-white shadow-lg shadow-slate-900/15 dark:bg-stone-50 dark:text-slate-950">
             DM
           </span>
-          <div>
-            <h1 className="font-mono text-lg font-bold tracking-tight text-slate-950 dark:text-white">DualMentor</h1>
-            <p className="hidden text-xs font-mono text-slate-500 dark:text-slate-400 sm:block">Two coding mentors, one chat desk</p>
-          </div>
+          <span className="text-sm font-semibold tracking-[0.22em] text-slate-800 dark:text-stone-200">DUALMENTOR</span>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <ThemeToggle />
           {user ? (
-            <div className="flex items-center gap-3">
-              <span className="hidden max-w-32 truncate text-sm font-mono text-slate-600 dark:text-slate-300 sm:inline">{user.name}</span>
+            <>
+              <span className="hidden max-w-32 truncate text-sm text-slate-600 dark:text-stone-400 sm:inline">{user.name}</span>
               <button
                 onClick={logout}
-                className="rounded-lg border border-red-200 px-3 py-2 text-sm font-mono text-red-600 transition hover:bg-red-50 dark:border-red-500/20 dark:text-red-300 dark:hover:bg-red-500/10"
+                className="rounded-md border border-slate-950/10 bg-white/55 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-200 dark:hover:bg-white/10"
                 type="button"
               >
                 Logout
               </button>
-            </div>
+            </>
           ) : (
             <Link
               href="/login"
-              className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-mono font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 dark:bg-white dark:text-slate-950"
+              className="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 dark:bg-stone-50 dark:text-slate-950"
             >
               Login
             </Link>
@@ -77,71 +64,52 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col px-5 pb-8 pt-8 sm:pt-14">
-        <section className="grid items-end gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <div>
-            <p className="mb-4 inline-flex rounded-full border border-slate-200 bg-white/60 px-3 py-1 text-xs font-mono font-semibold uppercase tracking-wider text-slate-600 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
-              Pick your mentor
-            </p>
-            <h2 className="max-w-3xl font-mono text-4xl font-black leading-tight tracking-tight text-slate-950 dark:text-white sm:text-6xl">
-              Learn faster with the mentor mode that matches your problem.
-            </h2>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg">
-              Choose fundamentals and motivation with Hitesh, or switch into systems, infra, and production architecture with Piyush.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 rounded-xl border border-slate-200 bg-white/55 p-3 shadow-xl shadow-slate-900/5 backdrop-blur dark:border-white/10 dark:bg-white/5">
-            {[
-              ["2", "mentor modes"],
-              ["10", "focus areas"],
-              ["1", "chat workspace"],
-            ].map(([value, label]) => (
-              <div key={label} className="rounded-lg bg-white/70 p-4 text-center dark:bg-slate-950/35">
-                <div className="font-mono text-2xl font-black text-slate-950 dark:text-white">{value}</div>
-                <div className="mt-1 text-xs font-mono text-slate-500 dark:text-slate-400">{label}</div>
-              </div>
-            ))}
-          </div>
+      <main className="mx-auto grid min-h-[calc(100vh-88px)] w-full max-w-7xl items-center gap-8 px-5 pb-8 lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="max-w-xl">
+          <div className="mb-6 h-px w-24 bg-slate-950/40 dark:bg-stone-100/40" />
+          <p className="mb-4 text-xs font-bold uppercase tracking-[0.35em] text-[#8b5e20] dark:text-[#d6b36a]">Choose signal</p>
+          <h1 className="text-5xl font-semibold leading-[0.95] tracking-tight text-slate-950 dark:text-stone-50 sm:text-7xl">
+            One desk.
+            <br />
+            Two minds.
+          </h1>
+          <p className="mt-6 max-w-md text-base leading-7 text-slate-600 dark:text-stone-400">
+            Pick the mentor that fits the problem and start the conversation.
+          </p>
         </section>
 
-        <section className="mt-10 grid gap-5 md:grid-cols-2">
+        <section className="grid gap-4">
           {mentors.map((mentor) => (
             <Link
               key={mentor.href}
               href={mentor.href}
-              className={`group rounded-xl border border-slate-200 bg-white/70 p-6 shadow-xl shadow-slate-900/5 backdrop-blur transition duration-300 hover:-translate-y-1 dark:border-white/10 dark:bg-white/5 ${mentor.classes.border}`}
+              className={`group glass-panel-strong relative overflow-hidden rounded-lg p-5 transition duration-300 hover:-translate-y-1 ${mentor.ring}`}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg font-mono text-lg font-black ring-1 ${mentor.classes.mark}`}>
-                    {mentor.mark}
-                  </span>
-                  <div>
-                    <h3 className="font-mono text-xl font-bold text-slate-950 dark:text-white">{mentor.name}</h3>
-                    <p className="mt-1 text-sm font-mono text-slate-500 dark:text-slate-400">{mentor.mentor}</p>
-                  </div>
+              <div className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${mentor.accent}`} />
+              <div className="grid gap-5 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+                <div className={`flex h-20 w-20 items-center justify-center rounded-md bg-gradient-to-br ${mentor.accent} text-3xl font-black text-white shadow-xl shadow-slate-900/15 dark:text-slate-950`}>
+                  {mentor.mark}
                 </div>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-mono text-slate-500 dark:bg-white/10 dark:text-slate-300">
-                  {mentor.tone}
-                </span>
-              </div>
-
-              <p className="mt-5 min-h-14 text-sm leading-6 text-slate-600 dark:text-slate-300">{mentor.description}</p>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {mentor.tags.map((tag) => (
-                  <span key={tag} className={`rounded-full px-2.5 py-1 text-xs font-mono ring-1 ${mentor.classes.tag}`}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className={`mt-6 flex items-center gap-2 font-mono text-sm font-semibold transition-all group-hover:gap-3 ${mentor.classes.cta}`}>
-                Start chat <span aria-hidden="true">-&gt;</span>
+                <div>
+                  <div className="mb-3 text-xs font-bold tracking-[0.28em] text-slate-400 dark:text-stone-500">{mentor.code}</div>
+                  <h2 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-stone-50">{mentor.name}</h2>
+                  <p className="mt-2 text-sm text-slate-500 dark:text-stone-400">{mentor.studio}</p>
+                </div>
+                <div className="flex items-end justify-between gap-4 sm:block sm:text-right">
+                  <p className="text-sm text-slate-600 dark:text-stone-400">{mentor.line}</p>
+                  <div className="mt-4 text-sm font-bold text-slate-950 transition group-hover:translate-x-1 dark:text-stone-50">Open</div>
+                </div>
               </div>
             </Link>
           ))}
+
+          <div className="grid grid-cols-3 gap-3">
+            {["Focused", "Private", "Fast"].map((item) => (
+              <div key={item} className="rounded-md border border-slate-950/10 bg-white/45 px-3 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-slate-500 backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-stone-400">
+                {item}
+              </div>
+            ))}
+          </div>
         </section>
       </main>
     </div>

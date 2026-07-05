@@ -18,29 +18,29 @@ interface ChatInterfaceProps {
 const MENTOR_CONFIG = {
   hitesh: {
     mark: "C",
-    name: "Chai aur Code",
-    subtitle: "Hitesh Choudhary",
-    tagline: "No spoon-feeding, only real learning.",
-    placeholder: "Apna sawaal likho bhai... chai ke saath samajhte hain",
-    emptyTitle: "Chai pe charcha karein?",
-    emptyText: "Ask about JavaScript, React, DSA, projects, career, or debugging fundamentals.",
-    header: "border-amber-200 bg-amber-50/90 dark:border-amber-500/20 dark:bg-amber-500/10",
-    markClass: "bg-amber-600 text-white",
-    inputFocus: "focus:ring-amber-500",
-    button: "bg-amber-600 hover:bg-amber-700 focus:ring-amber-500",
+     name: "Hitesh",
+    subtitle: "Chai aur Code",
+    tagline: "Fundamentals first.",
+    placeholder: "Ask Hitesh...",
+    emptyTitle: "Start with the stuck point.",
+    emptyText: "JS, React, DSA, projects, career.",
+    header: "border-[#d6b36a]/25 bg-[#fbfaf7]/85 dark:border-[#d6b36a]/20 dark:bg-[#11100d]/85",
+    markClass: "bg-[#d6b36a] text-slate-950",
+    inputFocus: "focus:ring-[#d6b36a]/50",
+    button: "bg-slate-950 hover:bg-slate-800 focus:ring-[#d6b36a]/50 dark:bg-stone-50 dark:text-slate-950 dark:hover:bg-stone-200",
   },
   piyush: {
     mark: "S",
-    name: "Systems Architect",
-    subtitle: "Piyush Garg",
-    tagline: "Production-grade, scalable, brutally honest.",
-    placeholder: "Describe your system, infra issue, backend bug, or scaling problem",
-    emptyTitle: "Let's architect something solid.",
-    emptyText: "Bring a backend, Docker, AWS, database, or system design problem.",
-    header: "border-sky-200 bg-sky-50/90 dark:border-sky-500/20 dark:bg-sky-500/10",
-    markClass: "bg-sky-600 text-white",
-    inputFocus: "focus:ring-sky-500",
-    button: "bg-sky-600 hover:bg-sky-700 focus:ring-sky-500",
+    name: "Piyush",
+    subtitle: "Systems Architect",
+    tagline: "Ship the solid version.",
+    placeholder: "Ask Piyush...",
+    emptyTitle: "Bring the system.",
+    emptyText: "Backend, infra, AWS, Docker, scale.",
+    header: "border-slate-950/10 bg-[#fbfaf7]/85 dark:border-white/10 dark:bg-[#0a0a0a]/85",
+    markClass: "bg-slate-950 text-white dark:bg-stone-50 dark:text-slate-950",
+    inputFocus: "focus:ring-slate-400/60",
+    button: "bg-slate-950 hover:bg-slate-800 focus:ring-slate-400/60 dark:bg-stone-50 dark:text-slate-950 dark:hover:bg-stone-200",
   },
 };
 
@@ -103,37 +103,37 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50">
-      <header className={`border-b px-4 py-3 backdrop-blur ${cfg.header}`}>
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+    <div className="mesh-bg flex h-screen flex-col text-slate-950 dark:text-stone-50">
+      <header className={`border-b px-4 py-3 backdrop-blur-xl ${cfg.header}`}>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="/" className="rounded-lg px-2 py-1 text-sm font-mono text-slate-600 transition hover:bg-white/70 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white">
-              &lt;- Back
+             <Link href="/" className="rounded-md border border-slate-950/10 bg-white/45 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10">
+              Back
             </Link>
-            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg font-mono font-black ${cfg.markClass}`}>
+            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md font-black shadow-lg shadow-slate-900/10 ${cfg.markClass}`}>
               {cfg.mark}
             </span>
             <div className="min-w-0">
-              <h1 className="truncate font-mono text-lg font-bold leading-tight">{cfg.name}</h1>
-              <p className="truncate text-xs font-mono text-slate-600 dark:text-slate-300">{cfg.subtitle}</p>
+              <h1 className="truncate text-lg font-semibold leading-tight">{cfg.name}</h1>
+              <p className="truncate text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-stone-500">{cfg.subtitle}</p>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-3">
-            <span className="hidden text-xs font-mono text-slate-500 dark:text-slate-400 md:block">{cfg.tagline}</span>
+          <div className="flex shrink-0 items-center gap-3">           <span className="hidden text-sm text-slate-500 dark:text-stone-400 md:block">{cfg.tagline}</span>
+
             <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mx-auto max-w-5xl">
+         <div className="mx-auto max-w-4xl">
           {messages.length === 0 && (
-            <div className="flex min-h-[55vh] flex-col items-center justify-center text-center">
-              <span className={`mb-4 flex h-16 w-16 items-center justify-center rounded-xl font-mono text-2xl font-black ${cfg.markClass}`}>
+            <div className="flex min-h-[58vh] flex-col items-center justify-center text-center">
+              <span className={`mb-5 flex h-20 w-20 items-center justify-center rounded-lg text-4xl font-black shadow-2xl shadow-slate-900/15 ${cfg.markClass}`}>
                 {cfg.mark}
               </span>
-              <h2 className="font-mono text-2xl font-bold text-slate-950 dark:text-white">{cfg.emptyTitle}</h2>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500 dark:text-slate-400">{cfg.emptyText}</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-stone-50">{cfg.emptyTitle}</h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500 dark:text-stone-400">{cfg.emptyText}</p>
             </div>
           )}
 
@@ -143,11 +143,11 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
 
           {loading && (
             <div className="mb-4 flex justify-start">
-              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+             <div className="rounded-lg border border-slate-950/10 bg-white/80 px-4 py-3 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5">
                 <div className="flex gap-1.5">
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400" style={{ animationDelay: "0ms" }} />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400" style={{ animationDelay: "150ms" }} />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400" style={{ animationDelay: "300ms" }} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-[#d6b36a]" style={{ animationDelay: "0ms" }} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-[#d6b36a]" style={{ animationDelay: "150ms" }} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-[#d6b36a]" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -155,27 +155,25 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
         </div>
       </div>
 
-      <div className="border-t border-slate-200 bg-white/90 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
-        <form
+       <div className="border-t border-slate-950/10 bg-[#fbfaf7]/88 px-4 py-4 backdrop-blur-xl dark:border-white/10 dark:bg-[#090909]/88">        <form
           onSubmit={(e) => {
             e.preventDefault();
             sendMessage();
           }}
-          className="mx-auto flex max-w-5xl gap-2"
+          className="mx-auto flex max-w-4xl gap-2"
         >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={cfg.placeholder}
-            className={`min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 ${cfg.inputFocus}`}
+             className={`glass-input min-w-0 flex-1 rounded-md px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 dark:text-stone-100 dark:placeholder:text-stone-600 ${cfg.inputFocus}`}
             disabled={loading}
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className={`rounded-lg px-5 py-3 text-sm font-mono font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 dark:focus:ring-offset-slate-950 ${cfg.button}`}
-          >
+           className={`rounded-md px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/10 transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 dark:focus:ring-offset-slate-950 ${cfg.button}`}          >
             Send
           </button>
         </form>
