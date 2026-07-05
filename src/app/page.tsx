@@ -11,7 +11,7 @@ const mentors = [
     name: "Hitesh",
     studio: "Chai aur Code",
     line: "JS, React, DSA, career.",
-    mark: "C",
+    avatar: "/asset/hitesh-sir.jpg",
     accent: "from-[#d6b36a] to-[#8b5e20]",
     ring: "group-hover:border-[#d6b36a]/55",
   },
@@ -21,7 +21,7 @@ const mentors = [
     name: "Piyush",
     studio: "Systems Architect",
     line: "Backend, infra, AWS, scale.",
-    mark: "S",
+    avatar: "/asset/piyush-sir.jpg",
     accent: "from-[#111827] to-[#64748b] dark:from-[#f7f4ed] dark:to-[#8f8a80]",
     ring: "group-hover:border-slate-900/35 dark:group-hover:border-white/35",
   },
@@ -34,10 +34,10 @@ export default function Home() {
     <div className="mesh-bg min-h-screen text-slate-950 dark:text-stone-50">
       <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-950 text-xs font-black text-white shadow-lg shadow-slate-900/15 dark:bg-stone-50 dark:text-slate-950">
-            DM
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/80 p-1 shadow-lg shadow-slate-900/10 ring-1 ring-slate-950/10 dark:bg-slate-900/80 dark:ring-white/10">
+            <img src="/asset/logo.png" alt="MentorOS logo" className="h-7 w-7 object-contain" />
           </span>
-          <span className="text-sm font-semibold tracking-[0.22em] text-slate-800 dark:text-stone-200">DUALMENTOR</span>
+          <span className="text-sm font-semibold tracking-[0.22em] text-slate-800 dark:text-stone-200">MENTOROS</span>
         </Link>
 
         <div className="flex items-center gap-2">
@@ -85,10 +85,14 @@ export default function Home() {
               href={mentor.href}
               className={`group glass-panel-strong relative overflow-hidden rounded-lg p-5 transition duration-300 hover:-translate-y-1 ${mentor.ring}`}
             >
-              <div className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${mentor.accent}`} />
+              <div className={`absolute inset-y-0 left-0 w-1 bg-linear-to-b ${mentor.accent}`} />
               <div className="grid gap-5 sm:grid-cols-[auto_1fr_auto] sm:items-center">
-                <div className={`flex h-20 w-20 items-center justify-center rounded-md bg-gradient-to-br ${mentor.accent} text-3xl font-black text-white shadow-xl shadow-slate-900/15 dark:text-slate-950`}>
-                  {mentor.mark}
+                <div className={`flex h-20 w-20 items-center justify-center rounded-lg bg-linear-to-br ${mentor.accent} p-0.5 shadow-xl shadow-slate-900/15`}>
+                  <img
+                    src={mentor.avatar}
+                    alt={mentor.name}
+                    className="h-full w-full rounded-lg object-cover"
+                  />
                 </div>
                 <div>
                   <div className="mb-3 text-xs font-bold tracking-[0.28em] text-slate-400 dark:text-stone-500">{mentor.code}</div>

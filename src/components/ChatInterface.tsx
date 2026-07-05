@@ -17,26 +17,26 @@ interface ChatInterfaceProps {
 
 const MENTOR_CONFIG = {
   hitesh: {
-    mark: "C",
-     name: "Hitesh",
+    name: "Hitesh",
     subtitle: "Chai aur Code",
     tagline: "Fundamentals first.",
     placeholder: "Ask Hitesh...",
     emptyTitle: "Start with the stuck point.",
     emptyText: "JS, React, DSA, projects, career.",
+    avatar: "/asset/hitesh-sir.jpg",
     header: "border-[#d6b36a]/25 bg-[#fbfaf7]/85 dark:border-[#d6b36a]/20 dark:bg-[#11100d]/85",
     markClass: "bg-[#d6b36a] text-slate-950",
     inputFocus: "focus:ring-[#d6b36a]/50",
     button: "bg-slate-950 hover:bg-slate-800 focus:ring-[#d6b36a]/50 dark:bg-stone-50 dark:text-slate-950 dark:hover:bg-stone-200",
   },
   piyush: {
-    mark: "S",
     name: "Piyush",
     subtitle: "Systems Architect",
     tagline: "Ship the solid version.",
     placeholder: "Ask Piyush...",
     emptyTitle: "Bring the system.",
     emptyText: "Backend, infra, AWS, Docker, scale.",
+    avatar: "/asset/piyush-sir.jpg",
     header: "border-slate-950/10 bg-[#fbfaf7]/85 dark:border-white/10 dark:bg-[#0a0a0a]/85",
     markClass: "bg-slate-950 text-white dark:bg-stone-50 dark:text-slate-950",
     inputFocus: "focus:ring-slate-400/60",
@@ -110,9 +110,7 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
              <Link href="/" className="rounded-md border border-slate-950/10 bg-white/45 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10">
               Back
             </Link>
-            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md font-black shadow-lg shadow-slate-900/10 ${cfg.markClass}`}>
-              {cfg.mark}
-            </span>
+            <img src={cfg.avatar} alt={cfg.name} className="h-10 w-10 shrink-0 rounded-md object-cover shadow-lg shadow-slate-900/10" />
             <div className="min-w-0">
               <h1 className="truncate text-lg font-semibold leading-tight">{cfg.name}</h1>
               <p className="truncate text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-stone-500">{cfg.subtitle}</p>
@@ -129,16 +127,14 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
          <div className="mx-auto max-w-4xl">
           {messages.length === 0 && (
             <div className="flex min-h-[58vh] flex-col items-center justify-center text-center">
-              <span className={`mb-5 flex h-20 w-20 items-center justify-center rounded-lg text-4xl font-black shadow-2xl shadow-slate-900/15 ${cfg.markClass}`}>
-                {cfg.mark}
-              </span>
+              <img src={cfg.avatar} alt={cfg.name} className="mb-5 h-20 w-20 rounded-lg object-cover shadow-2xl shadow-slate-900/15" />
               <h2 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-stone-50">{cfg.emptyTitle}</h2>
               <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500 dark:text-stone-400">{cfg.emptyText}</p>
             </div>
           )}
 
           {messages.map((msg, i) => (
-            <ChatMessage key={`${msg.role}-${i}`} role={msg.role} content={msg.content} mentor={mentor} />
+            <ChatMessage key={`${msg.role}-${i}`} role={msg.role} content={msg.content} mentor={mentor} profileImage={cfg.avatar} />
           ))}
 
           {loading && (

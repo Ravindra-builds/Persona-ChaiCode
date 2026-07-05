@@ -38,6 +38,8 @@ export function ChatMessage({ role, content, mentor, profileImage, videos: propV
   const { text, videos } = parseVideoBlocks(content);
   const resolvedVideos = propVideos?.length ? propVideos : videos;
   const resolvedChannelTitle = channelTitle ?? (mentor === "hitesh" ? "Chai aur Code" : "Piyush Garg");
+  const fallbackProfileImage = mentor === "hitesh" ? "/asset/hitesh-sir.jpg" : "/asset/piyush-sir.jpg";
+  const avatarSrc = profileImage || fallbackProfileImage;
 
   return (
     <div className={`mb-5 flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -50,13 +52,7 @@ export function ChatMessage({ role, content, mentor, profileImage, videos: propV
       >
         {!isUser && (
           <div className="mb-3 flex items-center gap-2 border-b border-slate-950/10 pb-2 text-xs font-bold text-slate-500 dark:border-white/10 dark:text-stone-400">
-            {profileImage ? (
-              <img src={profileImage} alt={resolvedChannelTitle} className="h-7 w-7 rounded object-cover" />
-            ) : (
-              <span className={`inline-flex h-7 w-7 items-center justify-center rounded text-[11px] font-black ${mentor === "hitesh" ? "bg-[#d6b36a] text-slate-950" : "bg-slate-950 text-white dark:bg-stone-50 dark:text-slate-950"}`}>
-                {mentor === "hitesh" ? "C" : "S"}
-              </span>
-            )}
+            <img src={avatarSrc} alt={resolvedChannelTitle} className="h-8 w-8 rounded-full object-cover ring-1 ring-slate-950/10" />
             <div>
               <div className="text-slate-800 dark:text-stone-200">{mentorLabel}</div>
               <div className="font-medium opacity-70">{resolvedChannelTitle}</div>

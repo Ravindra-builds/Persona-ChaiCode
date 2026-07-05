@@ -171,7 +171,7 @@ export function LoginForm() {
             <Link href="/" className="rounded-md border border-slate-950/10 bg-white/45 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10">
               Home
             </Link>
-            <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400 dark:text-stone-500">DualMentor</div>
+            <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400 dark:text-stone-500">MentorOS</div>
           </div>
 
           <div className="mb-8">

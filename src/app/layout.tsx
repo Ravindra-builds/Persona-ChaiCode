@@ -4,8 +4,8 @@ import { Providers } from "@/components/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "DualMentor - Chat with Hitesh & Piyush",
-  description: "Two mentors, one app. Learn fundamentals with Hitesh or architect systems with Piyush.",
+  title: "MentorOS - Chat with Hitesh & Piyush",
+  description: "A modern mentor workspace for learning fundamentals and architecting systems.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
