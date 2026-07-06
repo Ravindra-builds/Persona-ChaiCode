@@ -2,9 +2,17 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { findUserByEmail, updateUserVerification } from "@/lib/auth";
 import { verifyOtpCode } from "@/services/otpService";
+import { checkOtpRateLimit } from "@/utils/rateLimitingUtils";
+import {
+  handleApiError,
+  ValidationError,
+  NotFoundError,
+  AuthenticationError,
+  EmailServiceError,
+} from "@/utils/errorHandler";
 
 const otpSchema = z.object({
-  email: z.string().trim().email().toLowerCase(),
+  email: z.string().trim().email("Invalid email format").toLowerCase(),
   code: z.string().trim().regex(/^\d{6}$/, "OTP must be 6 digits."),
 });
 
@@ -13,25 +21,55 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, code } = otpSchema.parse(body);
 
+    // Rate limit check
+    try {
+      await checkOtpRateLimit(email);
+    } catch (rateLimitError) {
+      return handleApiError(rateLimitError, "OTP Verify: Rate limit exceeded");
+    }
+
+    // Find user
     const user = await findUserByEmail(email);
     if (!user) {
-      return NextResponse.json({ error: "No account found for this email." }, { status: 404 });
+      return handleApiError(
+        new NotFoundError("User"),
+        "OTP Verify: User not found"
+      );
     }
 
+    // Verify OTP
     try {
       await verifyOtpCode({ email, otp: code });
-    } catch {
-      return NextResponse.json({ error: "Invalid or expired OTP." }, { status: 400 });
+    } catch (otpError) {
+      return handleApiError(
+        new AuthenticationError(
+          "Invalid or expired OTP. Please request a new one."
+        ),
+        "OTP Verify: Invalid OTP"
+      );
     }
 
-    await updateUserVerification(user.id, true);
-    return NextResponse.json({ ok: true });
+    // Update user verification status
+    try {
+      await updateUserVerification(user.id, true);
+    } catch (updateError) {
+      return handleApiError(
+        new EmailServiceError("Failed to verify email. Please try again."),
+        "OTP Verify: Update verification failed"
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Email verified successfully",
+    });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.flatten().fieldErrors }, { status: 400 });
+      return handleApiError(
+        new ValidationError("Validation failed", err.flatten().fieldErrors as any),
+        "OTP Verify: Validation error"
+      );
     }
-
-    console.error("OTP verify error:", err);
-    return NextResponse.json({ error: "OTP verification failed." }, { status: 500 });
+    return handleApiError(err, "OTP Verify: Unexpected error");
   }
 }

@@ -1,6 +1,10 @@
-# DualMentor — Chat with Hitesh & Piyush
+# MentorOS — Chat with Hitesh & Piyush
 
-Two mentors. One app. Learn **fundamentals** with Hitesh Choudhary or architect **systems** with Piyush Garg.
+A Next.js 16 chat app that lets users talk to two mentor personas:
+- **Hitesh** for fundamentals, JavaScript, React, DSA, and career guidance.
+- **Piyush** for backend architecture, infra, AWS, scaling, and system design.
+
+The project includes authentication, protected tutor pages, rate limiting, and support for two LLM providers.
 
 ---
 
@@ -8,14 +12,28 @@ Two mentors. One app. Learn **fundamentals** with Hitesh Choudhary or architect 
 
 | Layer | Tech |
 |---|---|
-| Framework | Next.js 16 (App Router) |
-| Styling | Tailwind CSS 4 |
+| Framework | Next.js 16.2.6 (App Router) |
+| UI | React 19.2.6 + Tailwind CSS 4 |
 | Language | TypeScript |
 | Database | PostgreSQL |
 | ORM | Drizzle ORM |
-| Auth | JWT (access + refresh tokens) |
-| LLM (dev) | Google Gemini |
-| LLM (prod) | OpenAI |
+| Auth | JWT access + refresh tokens |
+| LLM | Google Gemini / OpenAI |
+| Cache | Upstash Redis (external) |
+
+---
+
+## What is included
+
+- Landing page with mentor selection
+- Protected chat pages for `/hitesh` and `/piyush`
+- `AuthContext` for in-memory access token state
+- `ThemeContext` with dark/light toggle and SSR-safe hydration
+- Chat API route with LLM response generation
+- Auth API routes for login, refresh, logout, OTP, and Google OAuth
+- Environment validation via `src/config/env.ts`
+- Redis-based rate limiting support in `src/utils/rateLimitingUtils.ts`
+
 
 ---
 
@@ -23,31 +41,54 @@ Two mentors. One app. Learn **fundamentals** with Hitesh Choudhary or architect 
 
 ### Prerequisites
 
-- **Node.js** 18+ installed
-- **PostgreSQL** running locally (or use Docker)
-- A **Gemini API key** (free tier works) — [get one here](https://aistudio.google.com/apikey)
+- Node.js 18+ installed
+- PostgreSQL available locally or remotely
+- `npm` available
 
-### Step-by-step
+### Install
 
 ```bash
 # 1. Clone the repo
-git clone <your-repo-url>
-cd dualmentor
+git clone https://github.com/Ravindra-builds/Persona-ChaiCode
+
+cd Persona-ChaiCode
 
 # 2. Install dependencies
 npm install
+```
 
-# 3. Copy environment file and fill in your values
+### Environment
+
+Copy `.env.example` and fill in the required values:
+
+```bash
 cp .env.example .env
 ```
 
-Edit `.env` — at minimum, set these:
+At minimum, set:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/app_db
-GEMINI_API_KEY=your-actual-gemini-key
-SKIP_AUTH=true    # keeps auth off while testing
+JWT_SECRET=your-jwt-secret
+JWT_REFRESH_SECRET=your-refresh-secret
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=your-gemini-key
+SKIP_AUTH=true
 ```
+
+Other useful values:
+
+```env
+OPENAI_API_KEY=your-openai-key
+OPENAI_MODEL=gpt-4.1
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
+```
+
+### Run locally
 
 ```bash
 # 4. Push database schema
@@ -57,7 +98,42 @@ npx drizzle-kit push
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Then open `http://localhost:3000`.
+
+---
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+npm run typecheck
+```
+
+---
+
+## Environment Variables
+
+Required:
+
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `JWT_REFRESH_SECRET`
+- `LLM_PROVIDER` (`gemini` or `openai`)
+
+Optional but recommended:
+
+- `GEMINI_API_KEY`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI`
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+- `SKIP_AUTH=true` for local testing without login
 
 ---
 
@@ -65,66 +141,65 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```
 src/
-├── config/
-│   └── env.ts              # All env vars loaded & validated here
-├── db/
-│   ├── index.ts            # Drizzle client
-│   └── schema.ts           # Users & OTPs tables
-├── lib/
-│   ├── auth.ts             # User CRUD, password hashing
-│   ├── tokens.ts           # JWT generation & verification
-│   └── otp.ts              # OTP generation & verification
-├── llm/
-│   ├── gemini.ts           # Gemini client (default/dev)
-│   ├── openai.ts           # OpenAI client (production)
-│   └── index.ts            # generateReply() — switches between providers
-├── components/
-│   ├── AuthContext.tsx      # In-memory access token state
-│   ├── ThemeContext.tsx     # Light/dark theme toggle
-│   ├── Providers.tsx       # Wraps both contexts
-│   ├── ChatInterface.tsx   # Shared chat UI (both mentors)
-│   ├── ChatMessage.tsx     # Single message bubble
-│   ├── LoginForm.tsx       # Login / Register / OTP form
-│   └── ThemeToggle.tsx     # Toggle switch
 ├── app/
-│   ├── layout.tsx          # Root layout with Providers
-│   ├── page.tsx            # Landing page with mentor cards
-│   ├── globals.css         # Tailwind + custom styles
-│   ├── login/page.tsx      # Auth page
-│   ├── hitesh/page.tsx     # Hitesh chat
-│   ├── piyush/page.tsx     # Piyush chat
-│   └── api/
-│       ├── auth/
-│       │   ├── register/route.ts
-│       │   ├── login/route.ts
-│       │   ├── otp/verify/route.ts
-│       │   ├── google/route.ts
-│       │   ├── google/callback/route.ts
-│       │   ├── refresh/route.ts
-│       │   └── logout/route.ts
-│       ├── chat/route.ts   # Main chat endpoint
-│       └── health/route.ts
-└── middleware.ts           # Auth guard (can be removed for testing)
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── login/route.ts
+│   │   │   ├── register/route.ts
+│   │   │   ├── otp/verify/route.ts
+│   │   │   ├── google/route.ts
+│   │   │   ├── google/callback/route.ts
+│   │   │   ├── refresh/route.ts
+│   │   │   └── logout/route.ts
+│   │   ├── chat/route.ts
+│   │   └── health/route.ts
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── login/page.tsx
+│   ├── hitesh/page.tsx
+│   └── piyush/page.tsx
+├── components/
+│   ├── AuthContext.tsx
+│   ├── ChatInterface.tsx
+│   ├── ChatMessage.tsx
+│   ├── LoginForm.tsx
+│   ├── Providers.tsx
+│   ├── ThemeContext.tsx
+│   └── ThemeToggle.tsx
+├── config/
+│   └── env.ts
+├── db/
+│   ├── index.ts
+│   └── schema.ts
+├── llm/
+│   ├── gemini.ts
+│   ├── openai.ts
+│   └── index.ts
+├── lib/
+│   ├── auth.ts
+│   ├── otp.ts
+│   └── tokens.ts
+└── utils/
+    ├── errorHandler.ts
+    ├── rateLimitingUtils.ts
+    └── constants.ts
 ```
 
 ---
 
 ## Authentication
 
-Three methods supported:
+Supported auth flows:
 
-1. **Email/Password** — Register → OTP verify → Login
-2. **OTP Verification** — 6-digit code logged to console in dev
-3. **Google OAuth** — Requires Google Cloud setup (client ID + secret)
+1. Email/password register and login
+2. OTP verification
+3. Google OAuth
 
-### Token Strategy
+The app stores:
 
-| Token | Storage | Lifetime |
-|---|---|---|
-| Access Token | In-memory (React context) | 15 minutes |
-| Refresh Token | HTTP-only cookie | 7 days |
-
-**No tokens in localStorage.** Access token lives in `AuthContext`. Refresh token is an HTTP-only cookie set by the server.
+- Access tokens in React context (`AuthContext`)
+- Refresh tokens in HTTP-only cookies
 
 ---
 

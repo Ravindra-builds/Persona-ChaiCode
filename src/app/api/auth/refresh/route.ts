@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { findUserByEmail } from "@/lib/auth";
 import { generateAccessToken, verifyRefreshToken } from "@/lib/tokens";
+import { checkRefreshTokenRateLimit } from "@/utils/rateLimitingUtils";
+import {
+  handleApiError,
+  AuthenticationError,
+  NotFoundError,
+} from "@/utils/errorHandler";
 
 export async function POST(req: Request) {
   try {
+ 
     const cookie = req.headers.get("cookie") ?? "";
     const refreshToken = cookie
       .split(";")
@@ -12,17 +19,44 @@ export async function POST(req: Request) {
       ?.slice("refreshToken=".length);
 
     if (!refreshToken) {
-      return NextResponse.json({ error: "Missing refresh token." }, { status: 401 });
+      return handleApiError(
+        new AuthenticationError("Missing refresh token."),
+        "Refresh: Missing token"
+      );
     }
 
-    const payload = verifyRefreshToken(decodeURIComponent(refreshToken));
+  
+    let payload: any;
+    try {
+      payload = verifyRefreshToken(decodeURIComponent(refreshToken));
+    } catch (tokenError) {
+      return handleApiError(
+        new AuthenticationError("Invalid or expired refresh token."),
+        "Refresh: Invalid token"
+      );
+    }
+
+
+    try {
+      await checkRefreshTokenRateLimit(payload.userId);
+    } catch (rateLimitError) {
+      return handleApiError(rateLimitError, "Refresh: Rate limit exceeded");
+    }
+
+
     const user = await findUserByEmail(payload.email);
     if (!user) {
-      return NextResponse.json({ error: "User no longer exists." }, { status: 401 });
+      return handleApiError(
+        new NotFoundError("User"),
+        "Refresh: User not found"
+      );
     }
 
+
     const accessToken = generateAccessToken({ userId: user.id, email: user.email });
+    
     return NextResponse.json({
+      success: true,
       accessToken,
       user: {
         id: user.id,
@@ -32,7 +66,6 @@ export async function POST(req: Request) {
       },
     });
   } catch (err) {
-    console.error("Refresh error:", err);
-    return NextResponse.json({ error: "Invalid refresh token." }, { status: 401 });
+    return handleApiError(err, "Refresh: Unexpected error");
   }
 }

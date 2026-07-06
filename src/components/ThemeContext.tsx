@@ -11,13 +11,13 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-function getInitialTheme(): Theme {
-  if (typeof document === "undefined") return "dark";
-  return (document.cookie.match(/theme=(light|dark)/)?.[1] as Theme | undefined) ?? "dark";
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [theme, setTheme] = useState<Theme>("dark");
+
+  useEffect(() => {
+    const savedTheme = document.cookie.match(/theme=(light|dark)/)?.[1] as Theme | undefined;
+    setTheme(savedTheme ?? "dark");
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");

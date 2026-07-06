@@ -118,6 +118,7 @@ export function LoginForm() {
       } else {
         login(data.accessToken, data.user);
         setSuccess("Email verified. Redirecting to home...");
+        window.location.assign("/");
         setOtpCode("");
       }
     } catch {
