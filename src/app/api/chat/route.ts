@@ -6,7 +6,6 @@ import { checkChatRateLimit } from "@/utils/rateLimitingUtils";
 import {
   handleApiError,
   ValidationError,
-  AuthenticationError,
   LLMError,
 } from "@/utils/errorHandler";
 
@@ -22,7 +21,7 @@ export async function POST(req: Request) {
     
     if (!userId) {
       return handleApiError(
-        new AuthenticationError("Unauthorized. Please sign in."),
+        new Error("Unauthorized. Please sign in."),
         "Chat: Unauthorized access"
       );
     }
