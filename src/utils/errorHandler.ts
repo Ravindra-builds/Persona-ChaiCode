@@ -16,20 +16,20 @@ export class AppError extends Error implements ApiError {
   type: string;
   details?: Record<string, unknown>;
 
-  constructor(
-    message: string,
-    statusCode = HTTP_STATUS_CODES.SERVER_ERROR,
-    type = ERROR_TYPES.INTERNAL_SERVER_ERROR,
-    details?: Record<string, unknown>
-  ) {
-    super(message);
+ constructor(
+  message: string,
+  statusCode: number = HTTP_STATUS_CODES.SERVER_ERROR,
+  type: string = ERROR_TYPES.INTERNAL_SERVER_ERROR,
+  details?: Record<string, unknown>
+) {
+  super(message);
 
-    this.statusCode = statusCode;
-    this.type = type;
-    this.details = details;
+  this.statusCode = statusCode;
+  this.type = type;
+  this.details = details;
 
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
+  Object.setPrototypeOf(this, new.target.prototype);
+}
 }
 
 /**
