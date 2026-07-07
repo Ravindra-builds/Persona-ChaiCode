@@ -5,92 +5,62 @@ import { ERROR_TYPES, HTTP_STATUS_CODES } from "./constants";
 export interface ApiError extends Error {
   statusCode: number;
   type: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 /**
- * Creates a standardized API error
+ * Base application error
  */
 export class AppError extends Error implements ApiError {
   statusCode: number;
   type: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 
   constructor(
     message: string,
-    statusCode: number = HTTP_STATUS_CODES.SERVER_ERROR,
-    type: string = ERROR_TYPES.INTERNAL_SERVER_ERROR,
-    details?: Record<string, any>
+    statusCode = HTTP_STATUS_CODES.SERVER_ERROR,
+    type = ERROR_TYPES.INTERNAL_SERVER_ERROR,
+    details?: Record<string, unknown>
   ) {
     super(message);
+
     this.statusCode = statusCode;
     this.type = type;
     this.details = details;
-    Object.setPrototypeOf(this, AppError.prototype);
+
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
 /**
- * Validation error for Zod and other validation errors
+ * Validation error
  */
 export class ValidationError extends AppError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(
       message,
       HTTP_STATUS_CODES.BAD_REQUEST,
       ERROR_TYPES.VALIDATION_ERROR,
       details
     );
-    Object.setPrototypeOf(this, ValidationError.prototype);
   }
 }
 
 /**
- * Authentication error
- */
-export class AuthenticationError extends AppError {
-  constructor(message: string = "Authentication failed", details?: Record<string, any>) {
-    super(
-      message,
-      HTTP_STATUS_CODES.UNAUTHORIZED,
-      ERROR_TYPES.AUTHENTICATION_ERROR,
-      details
-    );
-    Object.setPrototypeOf(this, AuthenticationError.prototype);
-  }
-}
-
-/**
- * Authorization error
- */
-export class AuthorizationError extends AppError {
-  constructor(message: string = "Access denied", details?: Record<string, any>) {
-    super(
-      message,
-      HTTP_STATUS_CODES.FORBIDDEN,
-      ERROR_TYPES.AUTHORIZATION_ERROR,
-      details
-    );
-    Object.setPrototypeOf(this, AuthorizationError.prototype);
-  }
-}
-
-/**
- * Not found error
+ * Resource not found
  */
 export class NotFoundError extends AppError {
-  constructor(resource: string = "Resource") {
+  constructor(resource = "Resource") {
     super(
       `${resource} not found`,
       HTTP_STATUS_CODES.NOT_FOUND,
       ERROR_TYPES.NOT_FOUND_ERROR
     );
-    Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }
 
 /**
- * Rate limit error
+ * Rate limit exceeded
  */
 export class RateLimitError extends AppError {
   constructor(message: string) {
@@ -99,159 +69,109 @@ export class RateLimitError extends AppError {
       HTTP_STATUS_CODES.RATE_LIMIT,
       ERROR_TYPES.RATE_LIMIT_ERROR
     );
-    Object.setPrototypeOf(this, RateLimitError.prototype);
   }
 }
 
 /**
- * Database error
- */
-export class DatabaseError extends AppError {
-  constructor(message: string = "Database operation failed") {
-    super(
-      message,
-      HTTP_STATUS_CODES.SERVER_ERROR,
-      ERROR_TYPES.DATABASE_ERROR
-    );
-    Object.setPrototypeOf(this, DatabaseError.prototype);
-  }
-}
-
-/**
- * Redis/Cache error
+ * Redis / Cache error
  */
 export class RedisError extends AppError {
-  constructor(message: string = "Cache operation failed") {
+  constructor(message = "Cache operation failed") {
     super(
       message,
       HTTP_STATUS_CODES.SERVER_ERROR,
       ERROR_TYPES.REDIS_ERROR
     );
-    Object.setPrototypeOf(this, RedisError.prototype);
   }
 }
 
 /**
- * LLM service error
+ * AI Provider error
  */
 export class LLMError extends AppError {
-  constructor(message: string = "Failed to generate response") {
+  constructor(message = "Failed to generate AI response") {
     super(
       message,
       HTTP_STATUS_CODES.SERVER_ERROR,
       ERROR_TYPES.LLM_ERROR
     );
-    Object.setPrototypeOf(this, LLMError.prototype);
   }
 }
 
 /**
- * Email service error
- */
-export class EmailServiceError extends AppError {
-  constructor(message: string = "Failed to send email") {
-    super(
-      message,
-      HTTP_STATUS_CODES.SERVER_ERROR,
-      ERROR_TYPES.EMAIL_SERVICE_ERROR
-    );
-    Object.setPrototypeOf(this, EmailServiceError.prototype);
-  }
-}
-
-/**
- * Converts different error types to standardized AppError
+ * Convert unknown errors to AppError
  */
 export function convertToAppError(error: unknown): AppError {
-  // Already an AppError
   if (error instanceof AppError) {
     return error;
   }
 
-  // Zod validation error
   if (error instanceof ZodError) {
-    const fieldErrors = error.flatten().fieldErrors;
-    return new ValidationError("Validation failed", fieldErrors as any);
-  }
-
-  // Standard Error
-  if (error instanceof Error) {
-    return new AppError(
-      error.message,
-      HTTP_STATUS_CODES.SERVER_ERROR,
-      ERROR_TYPES.INTERNAL_SERVER_ERROR
+    return new ValidationError(
+      "Validation failed",
+      error.flatten().fieldErrors as Record<string, unknown>
     );
   }
 
-  // Unknown error
-  return new AppError(
-    "An unexpected error occurred",
-    HTTP_STATUS_CODES.SERVER_ERROR,
-    ERROR_TYPES.INTERNAL_SERVER_ERROR
-  );
+  if (error instanceof Error) {
+    return new AppError(error.message);
+  }
+
+  return new AppError("An unexpected error occurred");
 }
 
 /**
- * Logs error with context
+ * Log errors
  */
 export function logError(
   error: unknown,
   context: string,
   level: "error" | "warn" = "error"
-): void {
-  const timestamp = new Date().toISOString();
-  const prefix = `[${timestamp}] [${context}]`;
+) {
+  const prefix = `[${new Date().toISOString()}] [${context}]`;
 
   if (error instanceof AppError) {
-    console[level](
-      `${prefix} ${error.type}: ${error.message}`,
-      error.details || {}
-    );
-  } else if (error instanceof Error) {
-    console[level](`${prefix} ${error.name}: ${error.message}`, error.stack);
+    console[level](prefix, {
+      type: error.type,
+      message: error.message,
+      details: error.details,
+    });
   } else {
-    console[level](`${prefix}`, error);
+    console[level](prefix, error);
   }
 }
 
 /**
- * Handles API errors and returns standardized NextResponse
+ * Standard API error response
  */
 export function handleApiError(
   error: unknown,
-  context: string,
-  isDevelopment: boolean = process.env.NODE_ENV === "development"
+  context: string
 ): NextResponse {
   const appError = convertToAppError(error);
 
-  // Log the error
   logError(appError, context);
 
-  const responseBody: any = {
-    success: false,
-    error: appError.message,
-    type: appError.type,
-  };
-
-  // Include validation details if present
-  if (appError.details) {
-    responseBody.details = appError.details;
-  }
-
-  // Include stack trace only in development
-  if (isDevelopment && appError instanceof Error) {
-    responseBody.stack = appError.stack;
-  }
-
-  return NextResponse.json(responseBody, {
-    status: appError.statusCode,
-  });
+  return NextResponse.json(
+    {
+      success: false,
+      error: appError.message,
+      type: appError.type,
+      details: appError.details,
+      ...(process.env.NODE_ENV === "development" && {
+        stack: appError.stack,
+      }),
+    },
+    {
+      status: appError.statusCode,
+    }
+  );
 }
 
 /**
- * Wraps an async API route handler with error handling
+ * Async API wrapper
  */
-export function withErrorHandling<T extends any[], R>(
+export function withErrorHandling<T extends unknown[]>(
   handler: (...args: T) => Promise<Response | NextResponse>,
   context: string
 ) {
