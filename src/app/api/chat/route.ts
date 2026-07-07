@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { auth } from "@clerk/nextjs/server";
 import { generateReply, type Mentor } from "@/llm";
 import { checkChatRateLimit } from "@/utils/rateLimitingUtils";
 import {
@@ -12,18 +13,26 @@ import {
 const chatSchema = z.object({
   mentor: z.enum(["hitesh", "piyush"]),
   messages: z.array(z.object({ role: z.string(), content: z.string() })).min(1, "At least one message is required"),
-  userId: z.string().optional(), 
 });
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { mentor, messages, userId } = chatSchema.parse(body);
+    // Get authenticated user from Clerk
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return handleApiError(
+        new AuthenticationError("Unauthorized. Please sign in."),
+        "Chat: Unauthorized access"
+      );
+    }
 
-   
-    const userIdentifier = userId || req.headers.get("x-forwarded-for") || "anonymous";
+    const body = await req.json();
+    const { mentor, messages } = chatSchema.parse(body);
+
+    // Apply rate limiting using Clerk userId
     try {
-      await checkChatRateLimit(userIdentifier);
+      await checkChatRateLimit(userId);
     } catch (rateLimitError) {
       return handleApiError(rateLimitError, "Chat: Rate limit exceeded");
     }

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { useAuth } from "@/components/AuthContext";
+import { useMemo } from "react";
+import { useAuth, useUser, SignOutButton,SignInButton,UserButton } from "@clerk/nextjs";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const mentors = [
@@ -29,18 +29,18 @@ const mentors = [
 ];
 
 export default function Home() {
-  const { user, logout } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
 
   const initials = useMemo(() => {
-    if (!user?.name) return "U";
-    return user.name
+    if (!user?.fullName) return "U";
+    return user.fullName
       .split(" ")
       .map((part) => part[0])
       .slice(0, 2)
       .join("")
       .toUpperCase();
-  }, [user?.name]);
+  }, [user?.fullName]);
 
   return (
     <div className="mesh-bg min-h-screen text-slate-950 dark:text-stone-50">
@@ -52,47 +52,17 @@ export default function Home() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          {user ? (
-            <div className="relative">
-              <button
-                onClick={() => setMenuOpen((value) => !value)}
-                className="flex items-center gap-2 rounded-full border border-slate-950/10 bg-white/70 px-2 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-stone-200 dark:hover:bg-white/10"
-                type="button"
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-xs font-bold text-white dark:bg-stone-100 dark:text-slate-950">
-                  {initials}
-                </span>
-                <span className="hidden max-w-28 truncate sm:inline">{user.name}</span>
-              </button>
-
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-950/10 bg-white/95 p-2 shadow-xl shadow-slate-900/10 backdrop-blur dark:border-white/10 dark:bg-slate-900/95">
-                  <button className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:bg-slate-950/5 dark:text-stone-300 dark:hover:bg-white/10" type="button">
-                    Profile
-                  </button>
-                  <button className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:bg-slate-950/5 dark:text-stone-300 dark:hover:bg-white/10" type="button">
-                    Settings
-                  </button>
-                  <button
-                    className="mt-1 flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-600 transition hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-500/10"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      logout();
-                    }}
-                    type="button"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+          {isSignedIn ? (
+            <div className="flex items-center gap-2 ml-2">
+               <UserButton/> 
             </div>
           ) : (
-            <Link
-              href="/login"
-              className="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 dark:bg-stone-50 dark:text-slate-950"
-            >
+            <SignInButton>
+              <button
+              className="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 dark:bg-stone-50 dark:text-slate-950">
               Login
-            </Link>
+            </button>
+            </SignInButton>
           )}
         </div>
       </nav>

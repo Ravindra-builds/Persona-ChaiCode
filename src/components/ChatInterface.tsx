@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "@clerk/nextjs";
 import { ChatMessage } from "./ChatMessage";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -57,7 +57,7 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const { accessToken } = useAuth();
+  const { isSignedIn } = useAuth();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
 
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+      // Clerk handles auth automatically via middleware
 
       const res = await fetch("/api/chat", {
         method: "POST",
