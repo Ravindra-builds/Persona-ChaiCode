@@ -1,265 +1,318 @@
-# MentorOS — Chat with Hitesh & Piyush
+# MentorOS 🚀
 
-A Next.js 16 chat app that lets users talk to two mentor personas:
-- **Hitesh** for fundamentals, JavaScript, React, DSA, and career guidance.
-- **Piyush** for backend architecture, infra, AWS, scaling, and system design.
+> AI mentors inspired by Hitesh Choudhary and Piyush Garg — built with Next.js, OpenAI/Gemini, Clerk, Neon, Drizzle, and Upstash Redis.
 
-The project includes authentication, protected tutor pages, rate limiting, and support for two LLM providers.
+🌐 **Live Demo:** https://persona-chaicode.onrender.com/
 
 ---
 
-## Tech Stack
+## ✨ Overview
 
-| Layer | Tech |
-|---|---|
-| Framework | Next.js 16.2.6 (App Router) |
-| UI | React 19.2.6 + Tailwind CSS 4 |
+MentorOS is an AI-powered mentoring platform where you can chat with mentors inspired by the publicly observable teaching styles of **Hitesh Choudhary** and **Piyush Garg**.
+
+Each mentor has a unique personality, teaching philosophy, and response style, creating a more natural and engaging learning experience.
+
+---
+
+## ✨ Features
+
+- 🤖 AI mentor personas
+  - ☕ **Hitesh** – Fundamentals, JavaScript, React, DSA & Career Guidance
+  - 🏗️ **Piyush** – Backend, System Design, Docker, AWS & Production Engineering
+- 🔐 Authentication with Clerk
+- 💬 Real-time chat experience
+- 🧠 Database-driven system prompts
+- ⚡ Redis prompt caching
+- 🚦 Daily message rate limiting (12 messages/day)
+- 🌙 Light & Dark mode
+- 🔒 Protected mentor pages
+- 🔄 Switch between Gemini and OpenAI using a single environment variable
+- 📱 Responsive UI
+
+---
+
+# 🛠 Tech Stack
+
+| Layer | Technology |
+|--------|------------|
+| Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
-| Database | PostgreSQL |
+| UI | React 19 + Tailwind CSS 4 |
+| Authentication | Clerk |
+| Database | Neon PostgreSQL |
 | ORM | Drizzle ORM |
-| Auth | JWT access + refresh tokens |
-| LLM | Google Gemini / OpenAI |
-| Cache | Upstash Redis (external) |
+| Cache | Upstash Redis |
+| AI Providers | OpenAI / Google Gemini |
+| Deployment | Render |
 
 ---
 
-## What is included
+# 🏗 Architecture
 
-- Landing page with mentor selection
-- Protected chat pages for `/hitesh` and `/piyush`
-- `AuthContext` for in-memory access token state
-- `ThemeContext` with dark/light toggle and SSR-safe hydration
-- Chat API route with LLM response generation
-- Auth API routes for login, refresh, logout, OTP, and Google OAuth
-- Environment validation via `src/config/env.ts`
-- Redis-based rate limiting support in `src/utils/rateLimitingUtils.ts`
-
+```text
+                User
+                  │
+                  ▼
+          Next.js API Route
+                  │
+        ┌─────────┴─────────┐
+        ▼                   ▼
+   Upstash Redis       Neon Database
+   (Prompt Cache)     (Mentor Prompts)
+        │                   │
+        └─────────┬─────────┘
+                  ▼
+          OpenAI / Gemini
+                  │
+                  ▼
+              AI Response
+```
 
 ---
 
-## Local Setup
+# 🚀 Getting Started
 
-### Prerequisites
-
-- Node.js 18+ installed
-- PostgreSQL available locally or remotely
-- `npm` available
-
-### Install
+## 1. Clone the repository
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/Ravindra-builds/Persona-ChaiCode
+git clone https://github.com/Ravindra-builds/Persona-ChaiCode.git
 
 cd Persona-ChaiCode
+```
 
-# 2. Install dependencies
+---
+
+## 2. Install dependencies
+
+```bash
 npm install
 ```
 
-### Environment
+---
 
-Copy `.env.example` and fill in the required values:
+## 3. Configure environment variables
 
-```bash
-cp .env.example .env
-```
-
-At minimum, set:
+Create a `.env.local` file.
 
 ```env
-DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/app_db
-JWT_SECRET=your-jwt-secret
-JWT_REFRESH_SECRET=your-refresh-secret
-LLM_PROVIDER=gemini
-GEMINI_API_KEY=your-gemini-key
-SKIP_AUTH=true
-```
+# Clerk
 
-Other useful values:
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
 
-```env
-OPENAI_API_KEY=your-openai-key
+# AI
+
+OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4.1
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
-UPSTASH_REDIS_REST_URL=...
-UPSTASH_REDIS_REST_TOKEN=...
+
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+
+LLM_PROVIDER=openai
+
+# Database
+
+DATABASE_URL=
+
+# Redis
+
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
 ```
 
-### Run locally
+---
+
+## 4. Run database migrations
 
 ```bash
-# 4. Push database schema
-npx drizzle-kit push
+npx drizzle-kit generate
 
-# 5. Start dev server
+npx drizzle-kit migrate
+```
+
+---
+
+## 5. Start the development server
+
+```bash
 npm run dev
 ```
 
-Then open `http://localhost:3000`.
+Open:
 
----
-
-## Scripts
-
-```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
-npm run typecheck
+```
+http://localhost:3000
 ```
 
 ---
 
-## Environment Variables
+# 📂 Project Structure
 
-Required:
-
-- `DATABASE_URL`
-- `JWT_SECRET`
-- `JWT_REFRESH_SECRET`
-- `LLM_PROVIDER` (`gemini` or `openai`)
-
-Optional but recommended:
-
-- `GEMINI_API_KEY`
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL`
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_REDIRECT_URI`
-- `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
-- `SKIP_AUTH=true` for local testing without login
-
----
-
-## Project Structure
-
-```
-src/
-├── app/
-│   ├── api/
-│   │   ├── auth/
-│   │   │   ├── login/route.ts
-│   │   │   ├── register/route.ts
-│   │   │   ├── otp/verify/route.ts
-│   │   │   ├── google/route.ts
-│   │   │   ├── google/callback/route.ts
-│   │   │   ├── refresh/route.ts
-│   │   │   └── logout/route.ts
-│   │   ├── chat/route.ts
-│   │   └── health/route.ts
-│   ├── globals.css
-│   ├── layout.tsx
-│   ├── page.tsx
-│   ├── login/page.tsx
-│   ├── hitesh/page.tsx
-│   └── piyush/page.tsx
-├── components/
-│   ├── AuthContext.tsx
-│   ├── ChatInterface.tsx
-│   ├── ChatMessage.tsx
-│   ├── LoginForm.tsx
-│   ├── Providers.tsx
-│   ├── ThemeContext.tsx
-│   └── ThemeToggle.tsx
-├── config/
-│   └── env.ts
-├── db/
-│   ├── index.ts
-│   └── schema.ts
-├── llm/
-│   ├── gemini.ts
-│   ├── openai.ts
-│   └── index.ts
-├── lib/
-│   ├── auth.ts
-│   ├── otp.ts
-│   └── tokens.ts
-└── utils/
-    ├── errorHandler.ts
-    ├── rateLimitingUtils.ts
-    └── constants.ts
+```text
+.
+├── src
+│   ├── app
+│   │   ├── api
+│   │   │   ├── chat
+│   │   │   ├── health
+│   │   │   └── status
+│   │   ├── hitesh
+│   │   ├── piyush
+│   │   ├── login
+│   │   ├── sign-up
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   │
+│   ├── components
+│   │   ├── ChatInterface.tsx
+│   │   ├── ChatMessage.tsx
+│   │   ├── Providers.tsx
+│   │   ├── ThemeContext.tsx
+│   │   └── ThemeToggle.tsx
+│   │
+│   ├── config
+│   │   └── env.ts
+│   │
+│   ├── db
+│   │   ├── index.ts
+│   │   ├── schema.ts
+│   │   └── seed.ts
+│   │
+│   ├── lib
+│   │   ├── prompt-service.ts
+│   │   └── youtube.ts
+│   │
+│   ├── llm
+│   │   ├── gemini.ts
+│   │   ├── openai.ts
+│   │   ├── toolExecutor.ts
+│   │   ├── tools.ts
+│   │   ├── types.ts
+│   │   └── index.ts
+│   │
+│   ├── utils
+│   │   ├── constants.ts
+│   │   ├── errorHandler.ts
+│   │   └── rateLimitingUtils.ts
+│   │
+│   └── proxy.ts
+│
+├── public
+├── drizzle.config.ts
+├── package.json
+└── README.md
 ```
 
 ---
 
-## Authentication
+# 🤖 Mentor Personas
 
-Supported auth flows:
+## ☕ Hitesh Choudhary
 
-1. Email/password register and login
-2. OTP verification
-3. Google OAuth
-
-The app stores:
-
-- Access tokens in React context (`AuthContext`)
-- Refresh tokens in HTTP-only cookies
+- Explains concepts from first principles
+- Friendly and conversational
+- Encourages learning instead of spoon-feeding
+- Strong focus on JavaScript, React, DSA, and career guidance
 
 ---
 
-## Skipping Auth for Testing
+## 🏗 Piyush Garg
 
-The middleware checks `SKIP_AUTH` env variable. With `SKIP_AUTH=true`:
-
-- All page routes are accessible without login
-- Chat API works without auth headers
-- Login page still works if you want to test it
-
-To fully remove auth checks: **delete `src/middleware.ts`**.
+- Architecture-first thinking
+- Production-ready implementation
+- Backend, Docker, AWS, DevOps & System Design
+- Focus on scalability, performance, and engineering best practices
 
 ---
 
-## Switching LLM Providers
+# 🧠 Prompt Management
 
-By default, the app uses **Gemini** (free tier, good for dev).
+Unlike traditional AI chat apps, MentorOS stores mentor system prompts in **Neon PostgreSQL**.
 
-To switch to OpenAI for production:
+Benefits:
 
-1. Set `LLM_PROVIDER=openai` in `.env`
-2. Set `OPENAI_API_KEY=your-key` in `.env`
-3. In `src/llm/index.ts`, uncomment the OpenAI lines and comment out the Gemini call
+- Update prompts without redeploying
+- Version-ready architecture
+- Cleaner codebase
+- Easier prompt management
 
-The `generateReply()` function is the single interface — swapping providers doesn't break anything else.
-
----
-
-## API Endpoints
-
-| Method | Path | Description |
-|---|---|---|
-| POST | `/api/auth/register` | Register with email/password |
-| POST | `/api/auth/login` | Login, get access token + refresh cookie |
-| POST | `/api/auth/otp/verify` | Verify email with OTP |
-| GET | `/api/auth/google` | Start Google OAuth flow |
-| GET | `/api/auth/google/callback` | Google OAuth callback |
-| POST | `/api/auth/refresh` | Refresh access token |
-| POST | `/api/auth/logout` | Clear refresh cookie |
-| POST | `/api/chat` | Send message, get mentor reply |
+Frequently used prompts are cached using **Upstash Redis** to reduce database reads and improve response time.
 
 ---
 
-## Mentor Personas
+# 🔐 Authentication
 
-### ☕ Hitesh Choudhary — Chai aur Code
+Authentication is handled by **Clerk**.
 
-- Warm Hinglish, chai vibes
-- **No spoon-feeding** — max 3-5 lines of code, then you continue
-- Best for: fundamentals, JS, React, motivation, career
+Features include:
 
-### 🏗️ Piyush Garg — Systems Architect
-
-- Direct, analytical, tech flirt
-- Full implementations, Dockerfiles, configs
-- Best for: backend, infra, scaling, Docker, AWS, system design
+- Email & Password
+- Google Authentication
+- Session Management
+- Protected Routes
+- User Management
 
 ---
 
-## License
+# ⚡ Rate Limiting
 
-MIT
+Every authenticated user gets:
+
+- **12 messages per day**
+- Shared across all mentors
+- Automatically resets every day
+- Powered by Upstash Redis
+
+---
+
+# 🤖 AI Provider
+
+Switch between providers with a single environment variable.
+
+```env
+LLM_PROVIDER=openai
+```
+
+or
+
+```env
+LLM_PROVIDER=gemini
+```
+
+No code changes required.
+
+---
+
+# 🚀 Future Improvements
+
+- Conversation history
+- Streaming responses
+- More mentor personas
+- Prompt versioning
+- Admin dashboard for prompt management
+- Voice conversations
+- Image understanding
+- RAG support
+- Multi-model comparison mode
+
+---
+
+# 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome.
+
+If you'd like to improve MentorOS, feel free to open an issue or submit a pull request.
+
+---
+
+# 📜 License
+
+MIT License
+
+---
+
+## 👨‍💻 Author
+
+**Ravindra Kumar**
+
+If you found this project helpful, consider giving it a ⭐.
