@@ -17,3 +17,16 @@ export interface AIResponse {
   reply: string;
   tools?: ToolResults;
 }
+
+export interface ToolCall {
+  id: string;
+
+  name: string;
+
+  arguments: Record<string, any>;
+}
+
+export interface LLMResponse {
+  reply: string;
+  toolCalls?: ToolCall[];
+}
