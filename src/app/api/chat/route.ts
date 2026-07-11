@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
-import { generateReply, type Mentor } from "@/llm";
+import { generateReply } from "@/llm";
+import { ChatMessage, Mentor } from "@/llm/types";
 import { checkChatRateLimit } from "@/utils/rateLimitingUtils";
 import {
   handleApiError,
@@ -38,19 +39,31 @@ export async function POST(req: Request) {
 
   
     try {
-      const reply = await generateReply(mentor as Mentor, messages);
-      return NextResponse.json({
-        success: true,
-        reply,
-      });
-    } catch (llmError) {
-      return handleApiError(
-        new LLMError(
-          llmError instanceof Error ? "Having issues with the LLM try again later": "Failed to generate response ,please try after some time"
-        ),
-        "Chat: LLM generation failed"
-      );
-    }
+  const { reply, youtube } = await generateReply(mentor as Mentor, messages as ChatMessage[]);
+
+  return NextResponse.json({
+    success: true,
+    reply,
+    youtube: youtube
+      ? {
+          videos: youtube.videos,
+          channelTitle: youtube.channelTitle,
+          profileImage: youtube.profileImage,
+          sourceMentor: youtube.sourceMentor,
+        }
+      : undefined,
+  });
+}  catch (llmError) {
+  console.error("LLM generation error:", llmError);
+
+  const message =
+    llmError instanceof Error ? llmError.message : "Unknown LLM error";
+
+  return handleApiError(
+    new LLMError(`Having issues with the LLM, try again later.`),
+    "Chat: LLM generation failed"
+  );
+}
   } catch (err) {
     if (err instanceof z.ZodError) {
       return handleApiError(

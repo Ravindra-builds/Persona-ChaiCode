@@ -1,3 +1,5 @@
+export type Mentor = "hitesh" | "piyush";
+
 export interface YouTubeVideo {
   id: string;
   title: string;
@@ -13,6 +15,21 @@ export interface YouTubeChannelInfo {
   profileImage: string;
   channelTitle: string;
   videos: YouTubeVideo[];
+  sourceMentor: Mentor;
+}
+
+const MENTOR_CHANNEL_IDS: Record<Mentor, string> = {
+  hitesh: "UCNQ6FEtztATuaVhZKCY28Yw",
+  piyush: "UCf9T51_FmMlfhiGpoes0yFA",
+};
+
+const MENTOR_CHANNEL_TITLES: Record<Mentor, string> = {
+  hitesh: "Chai aur Code",
+  piyush: "Piyush Garg",
+};
+
+function otherMentor(mentor: Mentor): Mentor {
+  return mentor === "hitesh" ? "piyush" : "hitesh";
 }
 
 function buildAvatarSvg(label: string) {
@@ -27,78 +44,100 @@ function buildAvatarSvg(label: string) {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-function fallbackChannelInfo(mentor: "hitesh" | "piyush") {
+function fallbackChannelInfo(mentor: Mentor): YouTubeChannelInfo {
   return {
     profileImage: buildAvatarSvg(mentor === "hitesh" ? "CA C" : "PG"),
-    channelTitle: mentor === "hitesh" ? "Chai aur Code" : "Piyush Garg",
+    channelTitle: MENTOR_CHANNEL_TITLES[mentor],
     videos: [],
+    sourceMentor: mentor,
   };
 }
 
-export async function fetchYouTubeVideos(mentor: "hitesh" | "piyush", limit = 3, topic?: string): Promise<YouTubeChannelInfo> {
-  const apiKey = process.env.YOUTUBE_API_KEY;
-  if (!apiKey) {
-    return fallbackChannelInfo(mentor);
-  }
+async function searchChannelVideos(
+  channelId: string,
+  apiKey: string,
+  limit: number,
+  topic?: string,
+): Promise<YouTubeVideo[]> {
+  const trimmedTopic = topic?.trim();
+  const params = new URLSearchParams({
+    part: "snippet",
+    channelId,
+    maxResults: String(limit),
+    type: "video",
+    order: trimmedTopic ? "relevance" : "date",
+    key: apiKey,
+  });
+  if (trimmedTopic) params.set("q", trimmedTopic);
 
-  const baseQueries = topic?.trim()
-    ? [
-        `${topic.trim()} ${mentor === "hitesh" ? "chai aur code" : "piyush garg"}`,
-        mentor === "hitesh" ? `${topic.trim()} piyush garg` : `${topic.trim()} chai aur code`,
-      ]
-    : [mentor === "hitesh" ? "chai aur code" : "piyush garg"];
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`);
+  const data = await res.json();
+  const items = Array.isArray(data.items) ? data.items : [];
+
+  return items.map((item: any) => ({
+    id: item.id?.videoId ?? "",
+    title: item.snippet?.title ?? "Untitled video",
+    description: item.snippet?.description ?? "",
+    url: `https://www.youtube.com/watch?v=${item.id?.videoId ?? ""}`,
+    thumbnail: item.snippet?.thumbnails?.high?.url ?? item.snippet?.thumbnails?.default?.url ?? "",
+    channelTitle: item.snippet?.channelTitle ?? "",
+    publishedAt: item.snippet?.publishedAt ?? "",
+    channelId: item.snippet?.channelId,
+  }));
+}
+
+async function fetchChannelProfileImage(
+  channelId: string,
+  apiKey: string,
+  mentor: Mentor,
+): Promise<string> {
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${apiKey}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const first = Array.isArray(data.items) ? data.items[0] : null;
+    return (
+      first?.snippet?.thumbnails?.high?.url ??
+      first?.snippet?.thumbnails?.default?.url ??
+      buildAvatarSvg(mentor === "hitesh" ? "CA C" : "PG")
+    );
+  } catch {
+    return buildAvatarSvg(mentor === "hitesh" ? "CA C" : "PG");
+  }
+}
+
+export async function fetchYouTubeVideos(
+  mentor: Mentor,
+  limit = 3,
+  topic?: string,
+): Promise<YouTubeChannelInfo> {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) return fallbackChannelInfo(mentor);
 
   try {
-    let videos: YouTubeVideo[] = [];
+    let videos = await searchChannelVideos(MENTOR_CHANNEL_IDS[mentor], apiKey, limit, topic);
+    let sourceMentor: Mentor = mentor;
 
-    for (const query of baseQueries) {
-      const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=${limit}&order=date&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
-      const searchResponse = await fetch(searchUrl);
-      const searchData = await searchResponse.json();
-      const items = Array.isArray(searchData.items) ? searchData.items : [];
-      const candidateVideos = items.map((item: any) => ({
-        id: item.id?.videoId ?? "",
-        title: item.snippet?.title ?? "Untitled video",
-        description: item.snippet?.description ?? "",
-        url: `https://www.youtube.com/watch?v=${item.id?.videoId ?? ""}`,
-        thumbnail: item.snippet?.thumbnails?.high?.url ?? item.snippet?.thumbnails?.default?.url ?? "",
-        channelTitle: item.snippet?.channelTitle ?? (mentor === "hitesh" ? "Chai aur Code" : "Piyush Garg"),
-        publishedAt: item.snippet?.publishedAt ?? "",
-        channelId: item.snippet?.channelId,
-      }));
-
-      if (candidateVideos.length) {
-        videos = candidateVideos;
-        break;
-      }
-    }
-
+    // Nothing on the requested mentor's own channel — let the other mentor recommend instead
     if (!videos.length) {
-      return fallbackChannelInfo(mentor);
+      const fallback = otherMentor(mentor);
+      videos = await searchChannelVideos(MENTOR_CHANNEL_IDS[fallback], apiKey, limit, topic);
+      sourceMentor = fallback;
     }
 
-    const channelIds = videos
-      .map((video: YouTubeVideo) => video.channelId)
-      .filter((channelId: string | undefined): channelId is string => Boolean(channelId))
-      .join(",");
-    const profileImage = channelIds
-      ? await (async () => {
-          try {
-            const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelIds}&key=${apiKey}`;
-            const channelResponse = await fetch(channelUrl);
-            const channelData = await channelResponse.json();
-            const firstChannel = Array.isArray(channelData.items) ? channelData.items[0] : null;
-            return firstChannel?.snippet?.thumbnails?.high?.url ?? firstChannel?.snippet?.thumbnails?.default?.url ?? buildAvatarSvg(mentor === "hitesh" ? "CA C" : "PG");
-          } catch {
-            return buildAvatarSvg(mentor === "hitesh" ? "CA C" : "PG");
-          }
-        })()
-      : buildAvatarSvg(mentor === "hitesh" ? "CA C" : "PG");
+    if (!videos.length) return fallbackChannelInfo(mentor);
+
+    const profileImage = await fetchChannelProfileImage(
+      MENTOR_CHANNEL_IDS[sourceMentor],
+      apiKey,
+      sourceMentor,
+    );
 
     return {
       profileImage,
-      channelTitle: videos[0]?.channelTitle ?? (mentor === "hitesh" ? "Chai aur Code" : "Piyush Garg"),
+      channelTitle: videos[0]?.channelTitle ?? MENTOR_CHANNEL_TITLES[sourceMentor],
       videos,
+      sourceMentor,
     };
   } catch {
     return fallbackChannelInfo(mentor);

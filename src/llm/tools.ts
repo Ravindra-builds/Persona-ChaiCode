@@ -1,4 +1,7 @@
-export const youtubeTool = {
+
+import { Type, type FunctionDeclaration } from "@google/genai";
+
+export const youtubeToolOpenAI = {
   type: "function",
   function: {
     name: "search_youtube",
@@ -15,3 +18,19 @@ export const youtubeTool = {
     }
   }
 } as const;
+
+
+export const youtubeToolGemini: FunctionDeclaration = {
+  name: "search_youtube",
+  description: "Search YouTube for videos on a given topic.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      topic: {
+        type: Type.STRING,
+        description: "The topic to search YouTube videos for.",
+      },
+    },
+    required: ["topic"],
+  },
+};

@@ -6,9 +6,20 @@ import { useAuth } from "@clerk/nextjs";
 import { ChatMessage } from "./ChatMessage";
 import { ThemeToggle } from "./ThemeToggle";
 
+interface ChatVideo {
+  title: string;
+  url: string;
+  thumbnail?: string;
+  channelTitle?: string;
+}
+
 interface Message {
   role: "user" | "assistant";
   content: string;
+  videos?: ChatVideo[];
+  channelTitle?: string;
+  profileImage?: string;
+  sourceMentor?: "hitesh" | "piyush";
 }
 
 interface ChatInterfaceProps {
@@ -112,10 +123,13 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
       };
       // Clerk handles auth automatically via middleware
 
-      const res = await fetch("/api/chat", {
+       const res = await fetch("/api/chat", {
         method: "POST",
         headers,
-        body: JSON.stringify({ mentor, messages: updated }),
+        body: JSON.stringify({
+          mentor,
+          messages: updated.map(({ role, content }) => ({ role, content })),
+        }),
       });
 
       const data = await res.json().catch(() => null);
@@ -126,7 +140,14 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
       if (data?.reply) {
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: data.reply },
+          {
+            role: "assistant",
+            content: data.reply,
+            videos: data.youtube?.videos,
+            channelTitle: data.youtube?.channelTitle,
+            profileImage: data.youtube?.profileImage,
+            sourceMentor: data.youtube?.sourceMentor,
+          },
         ]);
 
         await fetchRateLimit();
@@ -244,14 +265,18 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
           )}
 
           {messages.map((msg, i) => (
-            <ChatMessage
-              key={`${msg.role}-${i}`}
-              role={msg.role}
-              content={msg.content}
-              mentor={mentor}
-              profileImage={cfg.avatar}
-            />
-          ))}
+    <ChatMessage
+      key={`${msg.role}-${i}`}
+      role={msg.role}
+      content={msg.content}
+      mentor={mentor}
+      profileImage={cfg.avatar}
+      videos={msg.videos}
+      channelTitle={msg.channelTitle}
+      sourceMentor={msg.sourceMentor}
+    />
+  ))}
+
 
           {loading && (
             <div className="mb-4 flex justify-start">
