@@ -19,6 +19,10 @@ Each mentor has a unique personality, teaching philosophy, and response style, c
 - 🤖 AI mentor personas
   - ☕ **Hitesh** – Fundamentals, JavaScript, React, DSA & Career Guidance
   - 🏗️ **Piyush** – Backend, System Design, Docker, AWS & Production Engineering
+- 🎥 AI-driven YouTube recommendations (tool calling)
+  - Mentors search their own channel first, cross-recommend from the other mentor's channel when nothing relevant is found
+  - Results rendered as rich video cards (thumbnail, title, channel) in chat
+- 🔐 Authentication with Clerk
 - 🔐 Authentication with Clerk
 - 💬 Real-time chat experience
 - 🧠 Database-driven system prompts
@@ -43,6 +47,7 @@ Each mentor has a unique personality, teaching philosophy, and response style, c
 | ORM | Drizzle ORM |
 | Cache | Upstash Redis |
 | AI Providers | OpenAI / Google Gemini |
+| Video Data | YouTube Data API v3 |
 | Deployment | Render |
 
 ---
@@ -62,10 +67,24 @@ Each mentor has a unique personality, teaching philosophy, and response style, c
         │                   │
         └─────────┬─────────┘
                   ▼
-          OpenAI / Gemini
+           OpenAI / Gemini
                   │
-                  ▼
-              AI Response
+         ┌────────┴────────┐
+         ▼                 ▼
+     Text Reply      Tool Call Requested
+                            │
+                            ▼
+                     toolExecutor.ts
+                            │
+                            ▼
+                   YouTube Data API v3
+                   (channel-scoped search)
+                            │
+              ┌─────────────┴─────────────┐
+              ▼                           ▼
+     Structured video data        Trimmed summary sent
+     returned to client            back to model for
+     (for video cards)             final text reply
 ```
 
 ---
@@ -117,6 +136,10 @@ GEMINI_API_KEY=
 GEMINI_MODEL=gemini-2.5-flash
 
 LLM_PROVIDER=openai
+
+# YouTube
+
+YOUTUBE_API_KEY=
 
 # Database
 
@@ -273,6 +296,17 @@ Every authenticated user gets:
 
 ---
 
+# 🛡️ Security & Abuse Prevention
+
+- Per-message length capped (500 chars) and enforced server-side via Zod, independent of client-side UI limits
+- Conversation history capped at 30 messages per request to prevent oversized context windows in a single call
+- Message roles restricted to `user`/`assistant` to prevent system-prompt injection via the API
+- All API routes require Clerk authentication; unauthenticated requests are rejected
+- 12 messages/day per user, enforced server-side via Upstash Redis, independent of anything the client reports
+- Errors are logged server-side with full detail; client responses only ever return safe, generic messages (no stack traces or internal errors leaked outside development mode)
+
+---
+
 # 🤖 AI Provider
 
 Switch between providers with a single environment variable.
@@ -288,6 +322,16 @@ LLM_PROVIDER=gemini
 ```
 
 No code changes required.
+
+---
+
+# 🎥 YouTube Tool Calling
+
+Both mentors can search YouTube on the model's own initiative via function calling (OpenAI `tools` / Gemini `functionDeclarations`).
+
+- Search is scoped to each mentor's actual channel ID, not a text-based guess — avoids surfacing videos from unrelated channels.
+- If a mentor's own channel has nothing relevant, the other mentor's channel is searched as a fallback, and the response is labeled as a cross-recommendation.
+- Video metadata (thumbnail, title, channel) is captured directly from the tool result and returned to the client alongside the reply — it does not depend on the model accurately repeating it in prose.
 
 ---
 
@@ -321,6 +365,6 @@ MIT License
 
 ## 👨‍💻 Author
 
-**Ravindra Kumar**
+**Ravindra Yadav**
 
 If you found this project helpful, consider giving it a ⭐.

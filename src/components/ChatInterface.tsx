@@ -26,6 +26,8 @@ interface ChatInterfaceProps {
   mentor: "hitesh" | "piyush";
 }
 
+const MAX_MESSAGE_LENGTH = 500;
+
 const MENTOR_CONFIG = {
   hitesh: {
     name: "Hitesh",
@@ -71,7 +73,9 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
   const cfg = MENTOR_CONFIG[mentor];
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const remainingChars = MAX_MESSAGE_LENGTH - input.length;
   const [loading, setLoading] = useState(false);
+
   const [rateLimit, setRateLimit] = useState<{
     current: number;
     limit: number;
@@ -109,7 +113,7 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
 
   const sendMessage = async () => {
     const text = input.trim();
-    if (!text || loading) return;
+    if (!text || loading || text.length > MAX_MESSAGE_LENGTH) return;
 
     const userMsg: Message = { role: "user", content: text };
     const updated = [...messages, userMsg];
@@ -123,7 +127,7 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
       };
       // Clerk handles auth automatically via middleware
 
-       const res = await fetch("/api/chat", {
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -165,14 +169,13 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
     }
   };
 
-  const badgeColor =
-  !rateLimit
+  const badgeColor = !rateLimit
     ? ""
     : rateLimit.remaining <= 2
-    ? "border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
-    : rateLimit.remaining <= 5
-    ? "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
-    : "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300";
+      ? "border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
+      : rateLimit.remaining <= 5
+        ? "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
+        : "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300";
 
   return (
     <div className="mesh-bg flex h-screen flex-col text-slate-950 dark:text-stone-50">
@@ -204,43 +207,43 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
             <span className="hidden text-sm text-slate-500 dark:text-stone-400 md:block">
               {cfg.tagline}
             </span>
-          <div className="flex shrink-0 items-center gap-2">
-            
-  {rateLimit && (
-    <div className="flex shrink-0 items-center gap-3">
-  {rateLimit && (
-    <div
-      className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors ${badgeColor}`}
-    >
-      <span
-        className={`h-2 w-2 rounded-full ${
-          rateLimit.remaining <= 2
-            ? "bg-red-500"
-            : rateLimit.remaining <= 5
-            ? "bg-amber-500"
-            : "bg-emerald-500"
-        }`}
-      />
+            <div className="flex shrink-0 items-center gap-2">
+              {rateLimit && (
+                <div className="flex shrink-0 items-center gap-3">
+                  {rateLimit && (
+                    <div
+                      className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors ${badgeColor}`}
+                    >
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          rateLimit.remaining <= 2
+                            ? "bg-red-500"
+                            : rateLimit.remaining <= 5
+                              ? "bg-amber-500"
+                              : "bg-emerald-500"
+                        }`}
+                      />
 
-      {/* Mobile */}
-      <span className="sm:hidden">
-        {rateLimit.remaining}/{rateLimit.limit} msg
-      </span>
+                      {/* Mobile */}
+                      <span className="sm:hidden">
+                        {rateLimit.remaining}/{rateLimit.limit} msg
+                      </span>
 
-      {/* Tablet */}
-      <span className="hidden sm:inline lg:hidden">
-        {rateLimit.remaining} left
-      </span>
+                      {/* Tablet */}
+                      <span className="hidden sm:inline lg:hidden">
+                        {rateLimit.remaining} left
+                      </span>
 
-      {/* Desktop */}
-      <span className="hidden lg:inline">
-        {rateLimit.remaining} of {rateLimit.limit} messages left today
-      </span>
-    </div>
-  )}
-</div>
-  )}
-</div>
+                      {/* Desktop */}
+                      <span className="hidden lg:inline">
+                        {rateLimit.remaining} of {rateLimit.limit} messages left
+                        today
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <ThemeToggle />
           </div>
         </div>
@@ -265,18 +268,17 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
           )}
 
           {messages.map((msg, i) => (
-    <ChatMessage
-      key={`${msg.role}-${i}`}
-      role={msg.role}
-      content={msg.content}
-      mentor={mentor}
-      profileImage={cfg.avatar}
-      videos={msg.videos}
-      channelTitle={msg.channelTitle}
-      sourceMentor={msg.sourceMentor}
-    />
-  ))}
-
+            <ChatMessage
+              key={`${msg.role}-${i}`}
+              role={msg.role}
+              content={msg.content}
+              mentor={mentor}
+              profileImage={cfg.avatar}
+              videos={msg.videos}
+              channelTitle={msg.channelTitle}
+              sourceMentor={msg.sourceMentor}
+            />
+          ))}
 
           {loading && (
             <div className="mb-4 flex justify-start">
@@ -313,14 +315,21 @@ export function ChatInterface({ mentor }: ChatInterfaceProps) {
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) =>
+              setInput(e.target.value.slice(0, MAX_MESSAGE_LENGTH))
+            }
             placeholder={cfg.placeholder}
             className={`glass-input min-w-0 flex-1 rounded-md px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 dark:text-stone-100 dark:placeholder:text-stone-600 ${cfg.inputFocus}`}
             disabled={loading}
+            maxLength={MAX_MESSAGE_LENGTH}
+            
           />
+          
           <button
             type="submit"
-            disabled={loading || !input.trim()}
+            disabled={
+              loading || !input.trim() || input.length > MAX_MESSAGE_LENGTH
+            }
             className={`rounded-md px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/10 transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 dark:focus:ring-offset-slate-950 ${cfg.button}`}
           >
             Send
