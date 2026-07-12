@@ -16,7 +16,7 @@ const chatSchema = z.object({
     .array(
       z.object({
         role: z.enum(["user", "assistant"]),
-        content: z.string().min(1).max(500, "Message is too long"),
+        content: z.string().min(1).max(3000, "Message is too long"),
       }),
     )
     .min(1, "At least one message is required")
