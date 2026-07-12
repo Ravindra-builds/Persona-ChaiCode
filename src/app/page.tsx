@@ -47,7 +47,7 @@ export default function Home() {
       <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5">
         <Link href="/" className="flex items-center gap-3">
           <img src="/asset/logo.png" alt="MentorOS logo" className="h-10 w-auto object-contain" />
-          <span className="text-sm font-semibold tracking-[0.24em] text-slate-800 dark:text-stone-200">MENTOROS</span>
+          <span className="text-sm font-semibold tracking-[0.24em] text-slate-800 dark:text-stone-200">MENTOR<span className="bg-gradient-to-r from-sky-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">OS</span></span>
         </Link>
 
         <div className="flex items-center gap-2">
